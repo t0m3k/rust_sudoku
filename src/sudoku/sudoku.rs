@@ -68,18 +68,42 @@ impl Board {
 
     pub fn is_safe(&self, row: usize, col: usize, num: u8) -> bool {
         // Check the row
+        if self.row_is_safe(row, num) == false {
+            return false;
+        }
+        // Check the column
+        if self.column_is_safe(col, num) == false {
+            return false;
+        }
+        // Check the 3x3 sub-grid
+        if self.block_is_safe(row, col, num) == false {
+            return false;
+        }
+        true
+    }
+
+    pub fn row_is_safe(&self, row: usize, num: u8) -> bool {
+        // Check if `num` is in the row
         for i in 0..9 {
             if self.get(row, i).value == num {
                 return false;
             }
         }
-        // Check the column
+        true
+    }
+
+    pub fn column_is_safe(&self, col: usize, num: u8) -> bool {
+        // Check if `num` is in the column
         for i in 0..9 {
             if self.get(i, col).value == num {
                 return false;
             }
         }
-        // Check the 3x3 sub-grid
+        true
+    }
+
+    pub fn block_is_safe(&self, row: usize, col: usize, num: u8) -> bool {
+        // Check if `num` is in the 3x3 sub-grid
         let start_row = row - row % 3;
         let start_col = col - col % 3;
         for i in 0..3 {
