@@ -189,6 +189,24 @@ impl Board {
             println!();
         }
     }
+
+    pub fn add_candidate(&mut self, row: usize, col: usize, value: u8) {
+        self.cells[row * 9 + col].candidates.push(value);
+    }
+
+    pub fn remove_candidate(&mut self, row: usize, col: usize, value: u8) {
+        let index = self.cells[row * 9 + col]
+            .candidates
+            .iter()
+            .position(|&x| x == value)
+            .unwrap();
+        self.cells[row * 9 + col].candidates.remove(index);
+    }
+
+    pub fn clear_candidates(&mut self, row: usize, col: usize) {
+        self.cells[row * 9 + col].candidates.clear();
+    }
+
 }
 
 #[derive(Clone)]
