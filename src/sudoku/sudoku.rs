@@ -196,3 +196,70 @@ pub struct Cell {
     value: u8,
     candidates: Vec<u8>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_board() {
+        let board = Board::new();
+        assert_eq!(board.cells.len(), 81);
+        for cell in board.cells.iter() {
+            assert_eq!(cell.value, 0);
+        }
+    }
+
+    #[test]
+    fn test_row_is_safe() {
+        let mut board = Board::new();
+        board.set(0, 0, 5);
+        assert!(!board.row_is_safe(0, 5));
+        assert!(board.row_is_safe(0, 6));
+    }
+
+    #[test]
+    fn test_column_is_safe() {
+        let mut board = Board::new();
+        board.set(0, 0, 5);
+        assert!(!board.column_is_safe(0, 5));
+        assert!(board.column_is_safe(0, 6));
+    }
+
+    #[test]
+    fn test_block_is_safe() {
+        let mut board = Board::new();
+        board.set(0, 0, 5);
+        assert!(!board.block_is_safe(1, 1, 5));
+        assert!(board.block_is_safe(1, 1, 6));
+    }
+
+    #[test]
+    fn test_is_safe() {
+        let mut board = Board::new();
+        board.set(0, 0, 5);
+        assert!(!board.is_safe(0, 1, 5)); // Same row
+        assert!(!board.is_safe(1, 0, 5)); // Same column
+        assert!(!board.is_safe(1, 1, 5)); // Same block
+        assert!(board.is_safe(0, 1, 6));  // Different number
+    }
+
+    #[test]
+    fn test_solve() {
+        let mut board: Board = Board::new();
+        assert!(board.solve()); // Should solve an empty board
+        assert!(board.is_solved());
+        board.set(0, 0, 0);
+        assert!(board.solve()); // Should still solve the board
+        assert!(board.is_solved());
+    }
+
+    #[test]
+    fn test_generate_puzzle() {
+        let mut board = Board::new();
+        board.generate_puzzle();
+        let filled_cells = board.cells.iter().filter(|c| c.value != 0).count();
+        assert_ne!(filled_cells, 81); // Make sure it's not fully filled
+        assert!(filled_cells > 0);    // And not empty
+    }
+}
