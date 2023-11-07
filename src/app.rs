@@ -97,11 +97,14 @@ impl eframe::App for TemplateApp {
                                 let mut text = cell.value.to_string();
                                 if cell.value == 0 {
                                     text = "".to_string();
-                                    ui.add(
-                                        egui::TextEdit::singleline(&mut text).desired_width(20.0),
-                                    );
-                                } else {
-                                    ui.label(text);
+                                }
+
+                                let response = ui
+                                    .add(egui::TextEdit::singleline(&mut text).desired_width(20.0));
+                                if response.changed() {
+                                    if let Ok(value) = text.parse::<u8>() {
+                                        self.board.set(row, col, value);
+                                    }
                                 }
                                 ui.add_space(2.0);
                             }
