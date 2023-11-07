@@ -4,22 +4,13 @@ use crate::sudoku::sudoku;
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
-    // Example stuff:
-    label: String,
-
     board: sudoku::Board,
-
-    #[serde(skip)] // This how you opt-out of serialization of a field
-    value: f32,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
-            // Example stuff:
-            label: "Hello World!".to_owned(),
             board: sudoku::Board::new(),
-            value: 2.7,
         }
     }
 }
@@ -77,6 +68,16 @@ impl eframe::App for TemplateApp {
                 self.board.generate_puzzle();
             }
 
+            if ui.button("Solve").clicked() {
+                self.board.solve();
+            }
+
+            if self.board.is_solved() {
+                ui.label("Solved!");
+            } else {
+                ui.label("Not solved");
+            }
+
             ui.add(egui::Separator::default());
 
             ui.heading("Sudoku");
@@ -96,7 +97,9 @@ impl eframe::App for TemplateApp {
                                 let mut text = cell.value.to_string();
                                 if cell.value == 0 {
                                     text = "".to_string();
-                                    ui.add(egui::TextEdit::singleline(&mut text).desired_width(20.0));
+                                    ui.add(
+                                        egui::TextEdit::singleline(&mut text).desired_width(20.0),
+                                    );
                                 } else {
                                     ui.label(text);
                                 }
@@ -104,7 +107,6 @@ impl eframe::App for TemplateApp {
                             }
                             ui.add(egui::Separator::default());
                         });
-
                     }
                 });
             });

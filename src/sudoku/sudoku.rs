@@ -46,6 +46,13 @@ impl Board {
 
     pub fn generate_puzzle(&mut self) {
         // Step 1: Solve an empty board to generate a solved Sudoku grid
+        self.cells = vec![
+            Cell {
+                value: 0,
+                candidates: Vec::new(),
+            };
+            81
+        ];
         self.solve();
         // Step 2: Remove some numbers to create a puzzle
         let mut rng = thread_rng();
@@ -178,41 +185,22 @@ impl Board {
         digits.len() == 9 && digits[0] == 1 && digits[8] == 9
     }
 
-    pub fn print(&self) {
-        for row in 0..9 {
-            for col in 0..9 {
-                if self.get(row, col).value == 0 {
-                    print!(". ");
-                } else {
-                    print!("{} ", self.get(row, col).value);
-                }
-                if col % 3 == 2 {
-                    print!(" ");
-                }
-            }
-            if row % 3 == 2 {
-                println!();
-            }
-            println!();
-        }
-    }
+    // pub fn add_candidate(&mut self, row: usize, col: usize, value: u8) {
+    //     self.cells[row * 9 + col].candidates.push(value);
+    // }
 
-    pub fn add_candidate(&mut self, row: usize, col: usize, value: u8) {
-        self.cells[row * 9 + col].candidates.push(value);
-    }
+    // pub fn remove_candidate(&mut self, row: usize, col: usize, value: u8) {
+    //     let index = self.cells[row * 9 + col]
+    //         .candidates
+    //         .iter()
+    //         .position(|&x| x == value)
+    //         .unwrap();
+    //     self.cells[row * 9 + col].candidates.remove(index);
+    // }
 
-    pub fn remove_candidate(&mut self, row: usize, col: usize, value: u8) {
-        let index = self.cells[row * 9 + col]
-            .candidates
-            .iter()
-            .position(|&x| x == value)
-            .unwrap();
-        self.cells[row * 9 + col].candidates.remove(index);
-    }
-
-    pub fn clear_candidates(&mut self, row: usize, col: usize) {
-        self.cells[row * 9 + col].candidates.clear();
-    }
+    // pub fn clear_candidates(&mut self, row: usize, col: usize) {
+    //     self.cells[row * 9 + col].candidates.clear();
+    // }
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
