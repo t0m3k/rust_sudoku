@@ -1,16 +1,16 @@
-use crate::sudoku::sudoku;
+use crate::sudoku::board;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
-    board: sudoku::Board,
+    board: board::Board,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
-            board: sudoku::Board::new(),
+            board: board::Board::new(),
         }
     }
 }

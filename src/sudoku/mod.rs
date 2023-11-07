@@ -1,1 +1,1 @@
-pub mod sudoku;
+pub mod board;
