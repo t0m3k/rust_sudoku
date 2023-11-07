@@ -73,41 +73,55 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("WASM Sudoku");
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(&mut self.label);
-            });
-
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                self.value += 1.0;
+            if ui.button("New game").clicked() {
+                self.board.generate_puzzle();
             }
+
+            ui.add(egui::Separator::default());
+
+            ui.heading("Sudoku");
+
+            ui.horizontal(|ui| {
+                ui.vertical(|ui| {
+                    for row in 0..9 {
+                        if row % 3 == 0 {
+                            ui.add(egui::Separator::default());
+                        }
+                        ui.horizontal(|ui| {
+                            for col in 0..9 {
+                                if col % 3 == 0 {
+                                    ui.add(egui::Separator::default());
+                                }
+                                let cell = self.board.get(row, col);
+                                let mut text = cell.value.to_string();
+                                if cell.value == 0 {
+                                    text = "".to_string();
+                                    ui.add(egui::TextEdit::singleline(&mut text).desired_width(20.0));
+                                } else {
+                                    ui.label(text);
+                                }
+                                ui.add_space(2.0);
+                            }
+                            ui.add(egui::Separator::default());
+                        });
+
+                    }
+                });
+            });
 
             ui.separator();
 
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
-
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                powered_by_egui_and_eframe(ui);
+                footer(ui);
                 egui::warn_if_debug_build(ui);
             });
         });
     }
 }
 
-fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
+fn footer(ui: &mut egui::Ui) {
     ui.horizontal(|ui| {
         ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label("Powered by ");
-        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-        ui.label(" and ");
-        ui.hyperlink_to(
-            "eframe",
-            "https://github.com/emilk/egui/tree/master/crates/eframe",
-        );
-        ui.label(".");
+        ui.label("Tomasz Tracz");
     });
 }

@@ -218,8 +218,8 @@ impl Board {
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct Cell {
-    value: u8,
-    candidates: Vec<u8>,
+    pub value: u8,
+    pub candidates: Vec<u8>,
 }
 
 #[cfg(test)]
