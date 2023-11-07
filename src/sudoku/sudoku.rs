@@ -1,7 +1,8 @@
-extern crate rand;  // Add this line at the top of your file
+use rand;  // Add this line at the top of your file
 use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 
+#[derive(serde::Deserialize, serde::Serialize)]
 pub struct Board {
     pub cells: Vec<Cell>,
 }
@@ -209,7 +210,7 @@ impl Board {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct Cell {
     value: u8,
     candidates: Vec<u8>,

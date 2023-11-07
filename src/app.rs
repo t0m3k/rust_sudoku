@@ -1,9 +1,13 @@
+use crate::sudoku::sudoku;
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
     // Example stuff:
     label: String,
+
+    board: sudoku::Board,
 
     #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
@@ -14,6 +18,7 @@ impl Default for TemplateApp {
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
+            board: sudoku::Board::new(),
             value: 2.7,
         }
     }
@@ -66,7 +71,7 @@ impl eframe::App for TemplateApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("eframe template");
+            ui.heading("WASM Sudoku");
 
             ui.horizontal(|ui| {
                 ui.label("Write something: ");
