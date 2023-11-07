@@ -1,4 +1,4 @@
-use rand;  // Add this line at the top of your file
+use rand; // Add this line at the top of your file
 use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 
@@ -49,7 +49,8 @@ impl Board {
         self.solve();
         // Step 2: Remove some numbers to create a puzzle
         let mut rng = thread_rng();
-        for _ in 0..40 {  // Remove 40 numbers as an example; adjust as needed
+        for _ in 0..40 {
+            // Remove 40 numbers as an example; adjust as needed
             let row = rng.gen_range(0..9);
             let col = rng.gen_range(0..9);
             self.set(row, col, 0);
@@ -116,7 +117,6 @@ impl Board {
         }
         true
     }
-
 
     pub fn set(&mut self, row: usize, col: usize, value: u8) {
         // Set cell at `row`, `col` to `value`
@@ -213,7 +213,6 @@ impl Board {
     pub fn clear_candidates(&mut self, row: usize, col: usize) {
         self.cells[row * 9 + col].candidates.clear();
     }
-
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -266,7 +265,7 @@ mod tests {
         assert!(!board.is_safe(0, 1, 5)); // Same row
         assert!(!board.is_safe(1, 0, 5)); // Same column
         assert!(!board.is_safe(1, 1, 5)); // Same block
-        assert!(board.is_safe(0, 1, 6));  // Different number
+        assert!(board.is_safe(0, 1, 6)); // Different number
     }
 
     #[test]
@@ -285,6 +284,6 @@ mod tests {
         board.generate_puzzle();
         let filled_cells = board.cells.iter().filter(|c| c.value != 0).count();
         assert_ne!(filled_cells, 81); // Make sure it's not fully filled
-        assert!(filled_cells > 0);    // And not empty
+        assert!(filled_cells > 0); // And not empty
     }
 }
