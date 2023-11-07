@@ -69,15 +69,15 @@ impl Board {
 
     pub fn is_safe(&self, row: usize, col: usize, num: u8) -> bool {
         // Check the row
-        if self.row_is_safe(row, num) == false {
+        if !self.row_is_safe(row, num) {
             return false;
         }
         // Check the column
-        if self.column_is_safe(col, num) == false {
+        if !self.column_is_safe(col, num) {
             return false;
         }
         // Check the 3x3 sub-grid
-        if self.block_is_safe(row, col, num) == false {
+        if !self.block_is_safe(row, col, num) {
             return false;
         }
         true
@@ -142,34 +142,40 @@ impl Board {
 
     pub fn is_valid(&self) -> bool {
         // Check rows and columns
-        for row in 0..9 {
-            for col in 0..9 {
-                let value = self.get(row, col).value;
-                if value == 0 {
-                    continue;
+        for i in 0..9 {
+            let mut row_digits: Vec<u8> = Vec::new();
+            let mut col_digits: Vec<u8> = Vec::new();
+            for j in 0..9 {
+                row_digits.push(self.get(i, j).value);
+                col_digits.push(self.get(j, i).value);
+            }
+            if !Board::is_valid_digits(row_digits) || !Board::is_valid_digits(col_digits) {
+                return false;
+            }
+        }
+        // Check 3x3 sub-grids
+        for i in 0..3 {
+            for j in 0..3 {
+                let mut digits: Vec<u8> = Vec::new();
+                for k in 0..3 {
+                    for l in 0..3 {
+                        digits.push(self.get(3 * i + k, 3 * j + l).value);
+                    }
                 }
-                for i in 0..9 {
-                    if i != col && self.get(row, i).value == value {
-                        return false;
-                    }
-                    if i != row && self.get(i, col).value == value {
-                        return false;
-                    }
-                }
-                let block_row = row / 3;
-                let block_col = col / 3;
-                for i in 0..3 {
-                    for j in 0..3 {
-                        let row = block_row * 3 + i;
-                        let col = block_col * 3 + j;
-                        if row != row && col != col && self.get(row, col).value == value {
-                            return false;
-                        }
-                    }
+                if !Board::is_valid_digits(digits) {
+                    return false;
                 }
             }
         }
         true
+    }
+
+    pub fn is_valid_digits(digits: Vec<u8>) -> bool {
+        // Check if `digits` contains all digits from 1 to 9
+        let mut digits = digits;
+        digits.sort();
+        digits.dedup();
+        digits.len() == 9 && digits[0] == 1 && digits[8] == 9
     }
 
     pub fn print(&self) {
