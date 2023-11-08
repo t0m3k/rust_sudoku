@@ -196,33 +196,6 @@ impl Board {
         digits.dedup();
         digits.len() == 9 && digits[0] == 1 && digits[8] == 9
     }
-
-    fn print(&self) {
-        // Print the board
-        for i in 0..9 {
-            for j in 0..9 {
-                print!("{} ", self.get(i, j).value);
-            }
-            println!();
-        }
-    }
-
-    // pub fn add_candidate(&mut self, row: usize, col: usize, value: u8) {
-    //     self.cells[row * 9 + col].candidates.push(value);
-    // }
-
-    // pub fn remove_candidate(&mut self, row: usize, col: usize, value: u8) {
-    //     let index = self.cells[row * 9 + col]
-    //         .candidates
-    //         .iter()
-    //         .position(|&x| x == value)
-    //         .unwrap();
-    //     self.cells[row * 9 + col].candidates.remove(index);
-    // }
-
-    // pub fn clear_candidates(&mut self, row: usize, col: usize) {
-    //     self.cells[row * 9 + col].candidates.clear();
-    // }
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
