@@ -77,11 +77,11 @@ impl Board {
 
     pub fn is_safe(&self, row: usize, col: usize, num: u8) -> bool {
         // Check the row
-        if !self.row_is_safe(row, num) {
+        if !self.row_is_safe(row, col, num) {
             return false;
         }
         // Check the column
-        if !self.column_is_safe(col, num) {
+        if !self.column_is_safe(row, col, num) {
             return false;
         }
         // Check the 3x3 sub-grid
@@ -91,20 +91,26 @@ impl Board {
         true
     }
 
-    pub fn row_is_safe(&self, row: usize, num: u8) -> bool {
+    pub fn row_is_safe(&self, row: usize, col: usize, num: u8) -> bool {
+        if num == 0 {
+            return true;
+        }
         // Check if `num` is in the row
         for i in 0..9 {
-            if self.get(row, i).value == num {
+            if self.get(row, i).value == num && col != i {
                 return false;
             }
         }
         true
     }
 
-    pub fn column_is_safe(&self, col: usize, num: u8) -> bool {
+    pub fn column_is_safe(&self, row: usize, col: usize, num: u8) -> bool {
+        if num == 0 {
+            return true;
+        }
         // Check if `num` is in the column
         for i in 0..9 {
-            if self.get(i, col).value == num {
+            if self.get(i, col).value == num && row != i {
                 return false;
             }
         }
@@ -112,12 +118,18 @@ impl Board {
     }
 
     pub fn block_is_safe(&self, row: usize, col: usize, num: u8) -> bool {
+        if num == 0 {
+            return true;
+        }
         // Check if `num` is in the 3x3 sub-grid
         let start_row = row - row % 3;
         let start_col = col - col % 3;
         for i in 0..3 {
             for j in 0..3 {
-                if self.get(i + start_row, j + start_col).value == num {
+                if self.get(i + start_row, j + start_col).value == num
+                    && row != (i + start_row)
+                    && col != (j + start_col)
+                {
                     return false;
                 }
             }
@@ -185,6 +197,16 @@ impl Board {
         digits.len() == 9 && digits[0] == 1 && digits[8] == 9
     }
 
+    fn print(&self) {
+        // Print the board
+        for i in 0..9 {
+            for j in 0..9 {
+                print!("{} ", self.get(i, j).value);
+            }
+            println!();
+        }
+    }
+
     // pub fn add_candidate(&mut self, row: usize, col: usize, value: u8) {
     //     self.cells[row * 9 + col].candidates.push(value);
     // }
@@ -226,16 +248,28 @@ mod tests {
     fn test_row_is_safe() {
         let mut board = Board::new();
         board.set(0, 0, 5);
-        assert!(!board.row_is_safe(0, 5));
-        assert!(board.row_is_safe(0, 6));
+        assert!(!board.row_is_safe(0, 1, 5));
+        assert!(board.row_is_safe(0, 1, 6));
+        board.generate_puzzle();
+        for i in 0..9 {
+            for j in 0..9 {
+                assert!(board.row_is_safe(i, j, board.get(i, j).value));
+            }
+        }
     }
 
     #[test]
     fn test_column_is_safe() {
         let mut board = Board::new();
         board.set(0, 0, 5);
-        assert!(!board.column_is_safe(0, 5));
-        assert!(board.column_is_safe(0, 6));
+        assert!(!board.column_is_safe(1, 0, 5));
+        assert!(board.column_is_safe(1, 0, 6));
+        board.generate_puzzle();
+        for i in 0..9 {
+            for j in 0..9 {
+                assert!(board.column_is_safe(i, j, board.get(i, j).value));
+            }
+        }
     }
 
     #[test]
@@ -254,6 +288,12 @@ mod tests {
         assert!(!board.is_safe(1, 0, 5)); // Same column
         assert!(!board.is_safe(1, 1, 5)); // Same block
         assert!(board.is_safe(0, 1, 6)); // Different number
+        board.generate_puzzle();
+        for i in 0..9 {
+            for j in 0..9 {
+                assert!(board.is_safe(i, j, board.get(i, j).value));
+            }
+        }
     }
 
     #[test]

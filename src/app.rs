@@ -99,11 +99,24 @@ impl eframe::App for TemplateApp {
                                     text = "".to_string();
                                 }
 
-                                let response = ui
-                                    .add(egui::TextEdit::singleline(&mut text).desired_width(20.0));
+                                let colour = if !self.board.is_safe(row, col, cell.value) {
+                                    egui::Color32::from_rgb(255, 0, 0)
+                                } else {
+                                    ui.style().visuals.text_color()
+                                };
+
+                                let response = ui.add(
+                                    egui::TextEdit::singleline(&mut text)
+                                        .desired_width(20.0)
+                                        .text_color(colour),
+                                );
                                 if response.changed() {
-                                    if let Ok(value) = text.parse::<u8>() {
+                                    let parsed = text.parse::<u8>();
+
+                                    if let Ok(value) = parsed {
                                         self.board.set(row, col, value);
+                                    } else {
+                                        self.board.set(row, col, 0);
                                     }
                                 }
                                 ui.add_space(2.0);
