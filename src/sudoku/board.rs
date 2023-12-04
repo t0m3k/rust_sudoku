@@ -13,6 +13,7 @@ impl Board {
             cells: vec![
                 Cell {
                     value: 0,
+                    locked: false,
                     candidates: Vec::new(),
                 };
                 81
@@ -49,6 +50,7 @@ impl Board {
         self.cells = vec![
             Cell {
                 value: 0,
+                locked: true,
                 candidates: Vec::new(),
             };
             81
@@ -61,7 +63,12 @@ impl Board {
             let row = rng.gen_range(0..9);
             let col = rng.gen_range(0..9);
             self.set(row, col, 0);
+            self.unlock(row, col);
         }
+    }
+
+    fn unlock(&mut self, row: usize, col: usize) {
+        self.cells[row * 9 + col].locked = false;
     }
 
     pub fn find_empty(&self) -> Option<(usize, usize)> {
@@ -201,6 +208,7 @@ impl Board {
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct Cell {
     pub value: u8,
+    pub locked: bool,
     pub candidates: Vec<u8>,
 }
 

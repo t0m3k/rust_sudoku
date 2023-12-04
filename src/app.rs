@@ -50,7 +50,7 @@ impl eframe::App for TemplateApp {
                 {
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
-                            _frame.close();
+                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
                     });
                     ui.add_space(16.0);
@@ -63,6 +63,8 @@ impl eframe::App for TemplateApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("WASM Sudoku");
+
+            let mut focus: Option<(usize, usize)> = None;
 
             if ui.button("New game").clicked() {
                 self.board.generate_puzzle();
@@ -82,50 +84,69 @@ impl eframe::App for TemplateApp {
 
             ui.heading("Sudoku");
 
-            ui.horizontal(|ui| {
-                ui.vertical(|ui| {
+            egui::Grid::new("sudoku_grid")
+                .striped(true)
+                .min_row_height(30.0)
+                .show(ui, |ui| {
                     for row in 0..9 {
-                        if row % 3 == 0 {
-                            ui.add(egui::Separator::default());
-                        }
                         ui.horizontal(|ui| {
-                            for col in 0..9 {
-                                if col % 3 == 0 {
-                                    ui.add(egui::Separator::default());
-                                }
-                                let cell = self.board.get(row, col);
-                                let mut text = cell.value.to_string();
-                                if cell.value == 0 {
-                                    text = "".to_string();
-                                }
-
-                                let colour = if !self.board.is_safe(row, col, cell.value) {
-                                    egui::Color32::from_rgb(255, 0, 0)
-                                } else {
-                                    ui.style().visuals.text_color()
-                                };
-
-                                let response = ui.add(
-                                    egui::TextEdit::singleline(&mut text)
-                                        .desired_width(20.0)
-                                        .text_color(colour),
-                                );
-                                if response.changed() {
-                                    let parsed = text.parse::<u8>();
-
-                                    if let Ok(value) = parsed {
-                                        self.board.set(row, col, value);
-                                    } else {
-                                        self.board.set(row, col, 0);
-                                    }
-                                }
-                                ui.add_space(2.0);
-                            }
-                            ui.add(egui::Separator::default());
+                            ui.add_space(1.0);
                         });
+                        for col in 0..9 {
+                            let cell = self.board.get(row, col);
+                            let mut text = cell.value.to_string();
+                            if cell.value == 0 {
+                                text = "".to_string();
+                            }
+
+                            let colour = if !self.board.is_safe(row, col, cell.value) {
+                                egui::Color32::from_rgb(255, 0, 0)
+                            } else {
+                                ui.style().visuals.text_color()
+                            };
+
+                            if cell.locked {
+                                ui.centered_and_justified(|ui| {
+                                    ui.colored_label(colour, &text);
+                                });
+                            } else {
+                                ui.vertical_centered(|ui| {
+                                    ui.add_space(6.0);
+                                    let response = ui.add(
+                                        egui::TextEdit::singleline(&mut text)
+                                            .desired_width(20.0)
+                                            .text_color(colour)
+                                            .char_limit(1),
+                                    );
+                                    if response.changed() {
+                                        let parsed = text.parse::<u8>();
+
+                                        if let Ok(value) = parsed {
+                                            self.board.set(row, col, value);
+                                        } else {
+                                            self.board.set(row, col, 0);
+                                        }
+                                    }
+                                    if response.has_focus() {
+                                        focus.replace((row, col));
+                                    }
+                                });
+                            }
+                            if (col + 1) % 3 == 0 {
+                                ui.horizontal(|ui| {
+                                    ui.add_space(1.0);
+                                });
+                            }
+                        }
+                        ui.end_row();
+                        if row % 3 == 2 {
+                            ui.vertical(|ui| {
+                                ui.add_space(2.0);
+                            });
+                            ui.end_row();
+                        }
                     }
                 });
-            });
 
             ui.separator();
 
