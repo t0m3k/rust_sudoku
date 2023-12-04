@@ -64,8 +64,6 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("WASM Sudoku");
 
-            let mut focus: Option<(usize, usize)> = None;
-
             if ui.button("New game").clicked() {
                 self.board.generate_puzzle();
             }
