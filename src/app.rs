@@ -84,69 +84,7 @@ impl eframe::App for TemplateApp {
 
             ui.heading("Sudoku");
 
-            egui::Grid::new("sudoku_grid")
-                .striped(true)
-                .min_row_height(30.0)
-                .show(ui, |ui| {
-                    for row in 0..9 {
-                        ui.horizontal(|ui| {
-                            ui.add_space(1.0);
-                        });
-                        for col in 0..9 {
-                            let cell = self.board.get(row, col);
-                            let mut text = cell.value.to_string();
-                            if cell.value == 0 {
-                                text = "".to_string();
-                            }
-
-                            let colour = if !self.board.is_safe(row, col, cell.value) {
-                                egui::Color32::from_rgb(255, 0, 0)
-                            } else {
-                                ui.style().visuals.text_color()
-                            };
-
-                            if cell.locked {
-                                ui.centered_and_justified(|ui| {
-                                    ui.colored_label(colour, &text);
-                                });
-                            } else {
-                                ui.vertical_centered(|ui| {
-                                    ui.add_space(6.0);
-                                    let response = ui.add(
-                                        egui::TextEdit::singleline(&mut text)
-                                            .desired_width(20.0)
-                                            .text_color(colour)
-                                            .char_limit(1),
-                                    );
-                                    if response.changed() {
-                                        let parsed = text.parse::<u8>();
-
-                                        if let Ok(value) = parsed {
-                                            self.board.set(row, col, value);
-                                        } else {
-                                            self.board.set(row, col, 0);
-                                        }
-                                    }
-                                    if response.has_focus() {
-                                        focus.replace((row, col));
-                                    }
-                                });
-                            }
-                            if (col + 1) % 3 == 0 {
-                                ui.horizontal(|ui| {
-                                    ui.add_space(1.0);
-                                });
-                            }
-                        }
-                        ui.end_row();
-                        if row % 3 == 2 {
-                            ui.vertical(|ui| {
-                                ui.add_space(2.0);
-                            });
-                            ui.end_row();
-                        }
-                    }
-                });
+            grid(ui, &mut self.board);
 
             ui.separator();
 
@@ -163,4 +101,72 @@ fn footer(ui: &mut egui::Ui) {
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label("Tomasz Tracz");
     });
+}
+
+fn grid(ui: &mut egui::Ui, board: &mut board::Board) {
+    let mut focus: Option<(usize, usize)> = None;
+
+    egui::Grid::new("sudoku_grid")
+        .striped(true)
+        .min_row_height(30.0)
+        .show(ui, |ui| {
+            for row in 0..9 {
+                ui.horizontal(|ui| {
+                    ui.add_space(1.0);
+                });
+                for col in 0..9 {
+                    let cell = board.get(row, col);
+                    let mut text = cell.value.to_string();
+                    if cell.value == 0 {
+                        text = "".to_string();
+                    }
+
+                    let colour = if !board.is_safe(row, col, cell.value) {
+                        egui::Color32::from_rgb(255, 0, 0)
+                    } else {
+                        ui.style().visuals.text_color()
+                    };
+
+                    if cell.locked {
+                        ui.centered_and_justified(|ui| {
+                            ui.colored_label(colour, &text);
+                        });
+                    } else {
+                        ui.vertical_centered(|ui| {
+                            ui.add_space(6.0);
+                            let response = ui.add(
+                                egui::TextEdit::singleline(&mut text)
+                                    .desired_width(20.0)
+                                    .text_color(colour)
+                                    .char_limit(1),
+                            );
+                            if response.changed() {
+                                let parsed = text.parse::<u8>();
+
+                                if let Ok(value) = parsed {
+                                    board.set(row, col, value);
+                                } else {
+                                    board.set(row, col, 0);
+                                }
+                            }
+                            if response.has_focus() {
+                                focus.replace((row, col));
+                            }
+                        });
+                    }
+                    if (col + 1) % 3 == 0 {
+                        ui.horizontal(|ui| {
+                            ui.add_space(1.0);
+                        });
+                    }
+                }
+                ui.end_row();
+                if row % 3 == 2 {
+                    ui.vertical(|ui| {
+                        ui.add_space(2.0);
+                    });
+                    ui.end_row();
+                }
+            }
+        });
 }
