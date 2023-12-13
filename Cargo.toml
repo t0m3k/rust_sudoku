@@ -17,18 +17,18 @@ eframe = { version = "0.24.1", default-features = false, features = [
 log = "0.4.20"
 
 rand = "0.8.5"
-getrandom = { version = "0.2.10", features = ["js"] }
+getrandom = { version = "0.2.11", features = ["js"] }
 
 # You only need serde if you want app persistence:
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1.0.193", features = ["derive"] }
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-env_logger = "0.10"
+env_logger = "0.10.1"
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen-futures = "0.4.38"
+wasm-bindgen-futures = "0.4.39"
 
 
 [profile.release]
